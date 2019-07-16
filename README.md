@@ -3,6 +3,7 @@
 [Project Spec](https://webcms3.cse.unsw.edu.au/files/86f4ade7950342933e9b59cb4633c5033a01be6b4134b4f70442f4930bbdb267)
 [Project Resources](https://webcms3.cse.unsw.edu.au/COMP9517/19T2/resources/26910)
 
+[Watershed Paper](https://www.researchgate.net/publication/303719137_Watershed_Merge_Forest_Classification_for_Electron_Microscopy_Image_Stack_Segmentation)
 
 ### Watershed Method
 
@@ -35,3 +36,8 @@
 - Use greedy method to select nodes
     - Prune nodes which are incompatible with solution
 
+
+
+#### Extract from Section 2 of paper
+
+Aboundaryclassiﬁer[1]istrainedtopredicthowlikelya potential merge could happen. It takes features from a pair of potentialmergingregions (Ri,Rj) withinasectionandgives a probability pi,j that the two regions merge to one. Then every node Ni in the merge tree receives a potential Pi as Pi = pi0,j0 ·(1−pi,j), (1) wherepi0,j0 istheprobabilitythatthetwochildnodesNi0 and Nj0 merge,andpi,j istheprobabilitythatnodeNi mergewith its sibling node Nj. 
