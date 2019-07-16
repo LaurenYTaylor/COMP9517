@@ -18,6 +18,11 @@ import cv2 as cv
 import os
 import glob
 import pandas as pd
+import keras
+from keras.layers import Conv2D, BatchNormalization, Activation
+from keras.regularizers import l2
+
+
 
 os.chdir("C:/Users/bsmit/OneDrive/Desktop/Comp9517/project/")
 
@@ -66,9 +71,6 @@ def resnet_block(inputs,
         kernel_size (int): Conv2D square kernel dimensions
         strides (int): Conv2D square stride dimensions
         activation (string): activation name
-        batch_normalization (bool): whether to include batch normalization
-        conv_first (bool): conv-bn-activation (True) or
-            bn-activation-conv (False)
 
     # Returns
         x (tensor): tensor as input to the next layer
@@ -79,10 +81,16 @@ def resnet_block(inputs,
                   padding='same',
                   kernel_initializer='he_normal',
                   kernel_regularizer=l2(1e-4))
+    
+    # Two Conv layer block
     x = inputs
     x = conv(x)
     x = BatchNormalization()(x)
     x = Activation(activation)(x)
+    x = conv(x)
+    x = BatchNormalization()(x)
+    x = Activation(activation)(x)
+    x = keras.layers.add([x, inputs])
 
     return x
 
