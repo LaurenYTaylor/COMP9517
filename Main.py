@@ -60,6 +60,10 @@ def mirrorPadding(image,padding=0):
     out = cv.copyMakeBorder(image, padding, padding, padding, padding, cv.BORDER_REFLECT_101, None)
     return out
 
+def gaussianBlur(image, size):
+   out = cv.GaussianBlur(image,(size,size),0)
+   return out
+
 def resnet_block(inputs,
                  num_filters=16,
                  kernel_size=3,
