@@ -13,7 +13,7 @@ Mirroring sampling
 shifting potential
 """
 
-import numpy as np 
+import numpy as np
 import cv2 as cv
 import os
 import glob
@@ -21,20 +21,22 @@ import pandas as pd
 import keras
 from keras.layers import Conv2D, BatchNormalization, Activation
 from keras.regularizers import l2
+import os
 
 
 
-os.chdir("C:/Users/bsmit/OneDrive/Desktop/Comp9517/project/")
+# os.chdir("C:/Users/bsmit/OneDrive/Desktop/Comp9517/project/")
 
-file_name = glob.glob('C:/Users/bsmit/OneDrive/Desktop/Comp9517/project/data/images/*.jpg')
-labels = glob.glob('C:/Users/bsmit/OneDrive/Desktop/Comp9517/project/data/labels/*.jpg')
+filenames = glob.glob('./data/images/*.jpg')
+labels = glob.glob('./data/labels/*.jpg')
 
-labelsI = [int(i.split('-volume')[1][0:2]) for i in file_name]
+labelsI = [int(i.split('-volume')[1][0:2]) for i in filenames]
 labelsO = [int(i.split('-labels')[1][0:2]) for i in labels]
-fileI = [i.split('\\')[1] for i in file_name]
-fileO = [i.split('\\')[1] for i in labels]
 
-Input = {'filename':fileI,'label':labelsI,'filedir':file_name}
+fileI = [os.path.split(i)[1] for i in filenames]
+fileO = [os.path.split(i)[1] for i in labels]
+
+Input = {'filename':fileI,'label':labelsI,'filedir':filenames}
 Output = {'filename':fileO,'label':labelsO,'filedir':labels}
 
 Input = pd.DataFrame(data=Input)
@@ -81,7 +83,7 @@ def resnet_block(inputs,
                   padding='same',
                   kernel_initializer='he_normal',
                   kernel_regularizer=l2(1e-4))
-    
+
     # Two Conv layer block
     x = inputs
     x = conv(x)
@@ -98,9 +100,8 @@ if __name__ == '__main__':
     img = cv.imread(Input.iloc[0,2],0)
     new_img = mirrorPadding(img,1)
     new_img = equalize(img)
+    cv.imshow('new_img', new_img)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
 
 # use BORDER_REFLECT_101
-
-
-
-    
