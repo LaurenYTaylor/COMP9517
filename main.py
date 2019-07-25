@@ -8,7 +8,7 @@ image = cv2.cvtColor(cv2.imread(sys.argv[1]), cv2.COLOR_BGR2GRAY)
 #img = cv2.GaussianBlur(image,(513, 513),0)
 #output = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 9, 0)
 """
-Hypothetically the one that was most correct but resultent image lost too much detail
+Numerically the one that was most correct but resultent image lost too much detail
 """
 
 #img = cv2.GaussianBlur(image,(17,17),0)

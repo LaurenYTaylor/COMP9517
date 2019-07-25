@@ -23,7 +23,7 @@ for i, filename in enumerate(filenames):
 output = [None]*30
 
 for i in range(30):
-	img = cv2.GaussianBlur(image[i],(blursize, blursize),0)
+	icmg = cv2.GaussianBlur(image[i],(blursize, blursize),0)
 	#img = cv2.medianBlur(image[i], blursize)
 	ree, output[i] = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY)
 
