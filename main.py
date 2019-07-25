@@ -3,6 +3,7 @@ import numpy as np
 from sklearn import metrics
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.cluster import MeanShift
 from skimage.morphology import watershed
 from skimage.feature import peak_local_max
@@ -41,6 +42,7 @@ class SiftDetector():
 		return detector
 
 def getSift(sample):
+	"""
 	# extract features
 	kp = sift.detect(sample, None)
 	# extract feature data
@@ -54,6 +56,8 @@ def getSift(sample):
 		l += 1
 	for k in range(iterate):
 		vectors += [kp[k].angle,kp[k].class_id, kp[k].octave, kp[k].pt[0], kp[k].pt[1], kp[k].response, kp[k].size]
+	"""
+	vectors = sample.reshape((2*sampleSize)*(2*sampleSize))
 	return vectors
 
 
@@ -91,7 +95,7 @@ for i in range(24):
 	image = cv2.cvtColor(cv2.imread(images[i]), cv2.COLOR_BGR2GRAY)
 	label = cv2.cvtColor(cv2.imread(labels[i]), cv2.COLOR_BGR2GRAY)
 	# iterate 100 times
-	for j in range(200):
+	for j in range(100):
 		# generate random centre
 		centrey = random.randrange(sampleSize, image.shape[0]-sampleSize)
 		centrex = random.randrange(sampleSize, image.shape[1]-sampleSize)
@@ -99,15 +103,22 @@ for i in range(24):
 		truth = 1 if label[centrey][centrex] < 128 else 0
 		# extract subimage
 		sample = image[centrey-sampleSize:centrey+sampleSize, centrex-sampleSize:centrex+sampleSize]
-		
+
 		vectors = getSift(sample)
 
 		features.append(vectors)
 		truths.append(truth)
 
 # Train knn with data
+"""
 knn = KNeighborsClassifier(n_neighbors=101)
 knn.fit(features, truths)
+"""
+# Train random forest with data
+
+
+classifier = RandomForestClassifier(n_estimators=100, max_depth=2, random_state=0, verbose=0)
+classifier.fit(features, truths)
 
 for i in range(24, 25):
 	# create image arrays
@@ -120,18 +131,21 @@ for i in range(24, 25):
 		for k in range(sampleSize, sampleSize+image.shape[1]):
 			sample = padImage[j-sampleSize:j+sampleSize, k-sampleSize:k+sampleSize]
 			vectors = getSift(sample)
-			newImage[j-sampleSize][k-sampleSize] = knn.predict_proba([vectors])[0][1]*255
+			#newImage[j-sampleSize][k-sampleSize] = knn.predict_proba([vectors])[0][1]*255
+			newImage[j-sampleSize][k-sampleSize] = classifier.predict_proba([vectors])[0][0]*255
+			"""
 			if (minvalue > newImage[j-sampleSize][k-sampleSize]):
 				minvalue = newImage[j-sampleSize][k-sampleSize]
+			"""
 
 	cv2.imwrite('knnout.jpg', newImage)
-
+	"""
 	for j in range(newImage.shape[0]):
 		for k in range(newImage.shape[1]):
 			newImage[j][k] -= minvalue
 
 	cv2.imwrite('knnoutminus.jpg', newImage)
-
+	"""
 	# Perform watershed on knn probabilities
 	distance = ndi.distance_transform_edt(newImage)
 	maxes = peak_local_max(distance, indices = False, labels = newImage)
