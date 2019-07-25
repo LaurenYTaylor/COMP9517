@@ -3,9 +3,18 @@ import numpy as np
 from sklearn import metrics
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.cluster import MeanShift
+from skimage.morphology import watershed
+from skimage.feature import peak_local_max
+from scipy import ndimage as ndi
 import glob
 import sys
 import random
+
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+
+
 
 # SiftDetector from lab02
 class SiftDetector():
@@ -101,14 +110,36 @@ knn = KNeighborsClassifier(n_neighbors=101)
 knn.fit(features, truths)
 
 for i in range(24, 25):
+	# create image arrays
 	image = cv2.cvtColor(cv2.imread(images[i]), cv2.COLOR_BGR2GRAY)
 	padImage = cv2.copyMakeBorder(image, sampleSize, sampleSize, sampleSize, sampleSize, cv2.BORDER_REFLECT)
 	newImage = np.zeros((image.shape[0],image.shape[1]), np.uint8)
+	# perform knn on image
+	minvalue = 255
 	for j in range(sampleSize, sampleSize+image.shape[0]):
 		for k in range(sampleSize, sampleSize+image.shape[1]):
 			sample = padImage[j-sampleSize:j+sampleSize, k-sampleSize:k+sampleSize]
 			vectors = getSift(sample)
 			newImage[j-sampleSize][k-sampleSize] = knn.predict_proba([vectors])[0][1]*255
-	cv2.imshow("image", newImage)
+			if (minvalue > newImage[j-sampleSize][k-sampleSize]):
+				minvalue = newImage[j-sampleSize][k-sampleSize]
+
+	cv2.imwrite('knnout.jpg', newImage)
+
+	for j in range(newImage.shape[0]):
+		for k in range(newImage.shape[1]):
+			newImage[j][k] -= minvalue
+
+	cv2.imwrite('knnoutminus.jpg', newImage)
+
+	# Perform watershed on knn probabilities
+	distance = ndi.distance_transform_edt(newImage)
+	maxes = peak_local_max(distance, indices = False, labels = newImage)
+	markers = ndi.label(maxes)[0]
+	ws_labels = watershed(-distance, markers, mask=newImage)
+
+	cv2.imshow("image", ws_labels)
 	cv2.waitKey(0)
+
+	cv2.imwrite('watershedout.jpg', ws_labels)
 
