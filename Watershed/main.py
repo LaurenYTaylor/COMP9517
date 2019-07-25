@@ -7,7 +7,6 @@ import numpy as np
 import os
 from tqdm import tqdm
 
-
 kernel_size = 5
 
 
