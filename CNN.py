@@ -132,7 +132,7 @@ param_dict = {'filter1': filter1, 'kernel1':kernel1, 'kernel2':kernel2, 'pool1':
 				
 
 gs = GridSearchCV(KerasClassifier(build_fn=model, epochs=20), param_grid=param_dict, 
-					scoring='accuracy', n_jobs=1, cv=3)
+					scoring='accuracy', n_jobs=-1, cv=3)
 
 grid_result = gs.fit(X_train, y_train)
 
