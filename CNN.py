@@ -42,8 +42,8 @@ for i in range(len(label_filenames)):
 		labels_dict[str]=1
 with open('labels.pickle', 'wb') as f:
 	pickle.dump(labels_dict, f)
-#with open('labels.pickle', 'rb') as f:
-	#labels_dict=pickle.load(f)
+# with open('../labels.pickle', 'rb') as f:
+	# labels_dict=pickle.load(f)
 
 # black_pixels = 0
 # white_pixels = 0
@@ -70,12 +70,18 @@ def create_windows(image, label, stepSize, R=R):
 foveated_windows={}
 max_windows=30
 step_size=int(np.floor(IMAGE_WIDTH/max_windows))
-windows={}
+train_windows={}
+test_windows={}
 for i in range(len(images_dict.keys())):
 	label = list(images_dict.keys())[i]
 	image = list(images_dict.values())[i]
 	print('Creating pixel windows for image {}...........'.format(i))
-	windows.update(create_windows(image, label, step_size, R))
+	if label<23:
+		print('Train image: '+str(label))
+		train_windows.update(create_windows(image, label, step_size, R))
+	else:
+		print('Test image: '+str(label))
+		test_windows.update(create_windows(image, label, step_size, R))
 	#print('Foveating windows for image {}..........'.format(i))
 	# foveator = fov.Foveation(BLUR_RADIUS)
 	# j=0
@@ -84,24 +90,23 @@ for i in range(len(images_dict.keys())):
 		# foveated_windows[key]=(foveator.foveate(windows[key]))
 		# j+=1
 
-keys, values = zip(*windows.items())
-y = [labels_dict[key] for key in keys]
+train_keys, train_values = zip(*train_windows.items())
+
+y_train = [labels_dict[key] for key in train_keys]
 
 normalised_values=[]
-for image in values:
+for image in train_values:
 	normalised_values.append(image/np.amax(image))
 
 normalised_values=np.array(normalised_values)
-X = normalised_values.reshape(normalised_values.shape[0], normalised_values.shape[1], normalised_values.shape[2], 1)
-
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+X_train = normalised_values.reshape(normalised_values.shape[0], normalised_values.shape[1], normalised_values.shape[2], 1)
 
 #Define the neural network model
 
 
 def model(filter1=16,kernel1=2,pool1=2,kernel2=2,dropout1=0.5,dropout2=0.5,lr=0.0007):
 	model = Sequential()
-	model.add(Conv2D(filters=filter1, kernel_size=kernel1, input_shape=(X.shape[1],X.shape[2],1), activation='relu',data_format='channels_last', padding = 'same'))
+	model.add(Conv2D(filters=filter1, kernel_size=kernel1, input_shape=(X_train.shape[1],X_train.shape[2],1), activation='relu',data_format='channels_last', padding = 'same'))
 	model.add(MaxPooling2D(pool_size=pool1))
 	model.add(Dropout(dropout1))
 	model.add(Flatten())
@@ -127,9 +132,9 @@ param_dict = {'filter1': filter1, 'kernel1':kernel1, 'kernel2':kernel2, 'pool1':
 				
 
 gs = GridSearchCV(KerasClassifier(build_fn=model, epochs=20), param_grid=param_dict, 
-					scoring='accuracy', n_jobs=-1, cv=3)
+					scoring='accuracy', n_jobs=1, cv=3)
 
-grid_result = gs.fit(X, y)
+grid_result = gs.fit(X_train, y_train)
 
 with open('results_file.txt', 'w') as f:
 	f.write(str(grid_result.cv_results_))
@@ -138,10 +143,6 @@ with open('results_file.txt', 'w') as f:
 	f.write('\nBest Params:\n')
 	f.write(str(grid_result.best_params_))
 
-# test_fn = glob.glob('data/test/*')
-# label = int(test_fn[0][-6:-4])
-# test_image = cv2.cvtColor(cv2.imread(test_fn[0]), cv2.COLOR_BGR2GRAY)
-# test_windows = create_windows(test_image, label, 1, R)
 
 # reconstructed_image = np.ones(test_image.shape)
 # reconstructed_image = 255*reconstructed_image
