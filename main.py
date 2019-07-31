@@ -116,29 +116,32 @@ knn.fit(features, truths)
 """
 # Train random forest with data
 
-
-classifier = RandomForestClassifier(n_estimators=100, max_depth=2, random_state=0, verbose=0)
+print("data collected")
+classifier = RandomForestClassifier(n_estimators=100, random_state=0, verbose=0)
 classifier.fit(features, truths)
-
-for i in range(24, 25):
+print("classifier trained")
+for i in range(24, 30):
 	# create image arrays
+	print(i)
 	image = cv2.cvtColor(cv2.imread(images[i]), cv2.COLOR_BGR2GRAY)
 	padImage = cv2.copyMakeBorder(image, sampleSize, sampleSize, sampleSize, sampleSize, cv2.BORDER_REFLECT)
 	newImage = np.zeros((image.shape[0],image.shape[1]), np.uint8)
 	# perform knn on image
 	minvalue = 255
 	for j in range(sampleSize, sampleSize+image.shape[0]):
+		print("row " + str(j-sampleSize))
 		for k in range(sampleSize, sampleSize+image.shape[1]):
 			sample = padImage[j-sampleSize:j+sampleSize, k-sampleSize:k+sampleSize]
 			vectors = getSift(sample)
 			#newImage[j-sampleSize][k-sampleSize] = knn.predict_proba([vectors])[0][1]*255
 			newImage[j-sampleSize][k-sampleSize] = classifier.predict_proba([vectors])[0][0]*255
+			cv2.imwrite(str(i)+'classout.jpg', newImage)
 			"""
 			if (minvalue > newImage[j-sampleSize][k-sampleSize]):
 				minvalue = newImage[j-sampleSize][k-sampleSize]
 			"""
 
-	cv2.imwrite('knnout.jpg', newImage)
+	cv2.imwrite(str(i)+'classout.jpg', newImage)
 	"""
 	for j in range(newImage.shape[0]):
 		for k in range(newImage.shape[1]):
@@ -147,13 +150,16 @@ for i in range(24, 25):
 	cv2.imwrite('knnoutminus.jpg', newImage)
 	"""
 	# Perform watershed on knn probabilities
+	"""
 	distance = ndi.distance_transform_edt(newImage)
 	maxes = peak_local_max(distance, indices = False, labels = newImage)
 	markers = ndi.label(maxes)[0]
 	ws_labels = watershed(-distance, markers, mask=newImage)
 
+	
 	cv2.imshow("image", ws_labels)
 	cv2.waitKey(0)
 
-	cv2.imwrite('watershedout.jpg', ws_labels)
+	cv2.imwrite('watershedclassout.jpg', ws_labels)
 
+	"""
