@@ -42,7 +42,7 @@ Otsu filtering resulted in two different graphs for gaussian and median filterin
 
 The global minimum with the otsu thresholding and gaussian filtering combination showed a satisfactory result. While the segmentated cell membranes were quite thick, they followed the correct shape and pattern. Cell nuclei were incorrectly segmentated as a result of the limiatation of this technique.
 
-![Otsu + Median 555](img/otsugaus555.jpg)
+![Otsu + Median 555](img/otsumedian555.jpg)
 ![Truth](img/train-labels01.jpg)
 
 The global minimum for otsu thresholding and median filtering reveal a poorly segmentated image. While there may be numically less errors in this image, all the details of cell membranes have been lost from the high filtering parameter.
