@@ -21,7 +21,7 @@ Global thresholding seemed adversely affected by both, gaussian and median filte
 
 The graphs for adaptive thresholding suggest reduced error the larger the filtering parameter. Median filtering provided a smoother curve than gaussian, but gaussian performed better overall.
 
-![Adaptive + Gaussian 513](img/adaptivegaus513.png)
+![Adaptive + Gaussian 513](img/adaptivegaus513.jpg)
 ![Truth](img/train-labels01.jpg)
 
 However, the output was visually undesirable, with no detail being able to be made out from it. A vast majority of pixels were classified as membrane which is clearly incorrect
