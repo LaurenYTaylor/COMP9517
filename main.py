@@ -1,3 +1,6 @@
+# COMP9517 Project
+# Michael Chan, Justin Nguyen
+
 import cv2
 import numpy as np
 from sklearn import metrics
