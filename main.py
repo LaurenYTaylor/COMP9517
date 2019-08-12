@@ -1,3 +1,6 @@
+# COMP9517 Assignment
+# Michael Chan
+
 import numpy as np
 import cv2
 import glob
